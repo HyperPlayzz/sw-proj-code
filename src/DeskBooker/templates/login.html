@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .login-wrapper { display: flex; gap: 40px; }
+        .form-box { flex: 1; }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="form-box">
+    <h2>Login</h2>
+
+    {% with messages = get_flashed_messages(category_filter=['login']) %}
+      {% if messages %}
+        <div class="flash">
+          {% for message in messages %}
+            <div>{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login_page') }}">
+        <input type="hidden" name="action" value="login">
+        <label>Email:</label><br>
+        <input type="email" name="email" required minlength="5" maxlength="120"><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password" required minlength="6"><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <div class="form-box">
+    <h2>Register</h2>
+
+    {% with messages = get_flashed_messages(category_filter=['register']) %}
+      {% if messages %}
+        <div class="flash">
+          {% for message in messages %}
+            <div>{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login_page') }}" onsubmit="return validateRegistration()">
+        <input type="hidden" name="action" value="register">
+        <label>Name:</label><br>
+        <input type="text" name="reg_name" required minlength="1" maxlength="100" id="reg_name"><br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="reg_email" required minlength="5" maxlength="120" id="reg_email"><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="reg_password" required minlength="6" maxlength="255" id="reg_password"><br><br>
+
+        <label>Confirm Password:</label><br>
+        <input type="password" name="reg_confirm_password" required minlength="6" maxlength="255" id="reg_confirm_password"><br><br>
+
+        <label>Register as:</label><br>
+        <select name="role" required>
+            <option value="2">Regular User</option>
+            <option value="1">Administrator</option>
+        </select><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <script>
+    function validateRegistration() {
+        const name = document.getElementById('reg_name').value.trim();
+        const email = document.getElementById('reg_email').value.trim();
+        const pwd = document.getElementById('reg_password').value;
+        const confirm = document.getElementById('reg_confirm_password').value;
+        
+        if (name.length === 0 || name.length > 100) {
+            alert('Name must be 1-100 characters');
+            return false;
+        }
+        if (email.length < 5 || email.length > 120) {
+            alert('Email must be 5-120 characters');
+            return false;
+        }
+        if (pwd.length < 6 || pwd.length > 255) {
+            alert('Password must be 6-255 characters');
+            return false;
+        }
+        if (pwd !== confirm) {
+            alert('Passwords do not match');
+            return false;
+        }
+        return true;
+    }
+    </script>
+  </div>
+</div>
+
+</body>
+</html>

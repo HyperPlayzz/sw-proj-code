@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Desks{% endblock %}
+
+{% block content %}
+<h2>Admin: Manage Desks</h2>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div style="color:green;">
+      {% for message in messages %}
+        {{ message }}<br>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<h3>Create Desk</h3>
+<form method="POST" action="{{ url_for('manage_desks') }}" onsubmit="return validateDeskForm()">
+    <input type="hidden" name="action" value="create">
+    <label>Desk Number:</label>
+    <input type="text" name="desk_number" required minlength="1" maxlength="20" pattern="[A-Za-z]{1,3}[- ]?[0-9]+[A-Za-z]*" title="Format: SH 154 or SH-154E or T-1" id="desk_number">
+    <label>Floor:</label>
+    <input type="number" name="floor" required min="0" max="100" id="floor">
+    <label>Site:</label>
+    <select name="site_id" required>
+        {% for s in sites %}
+        <option value="{{ s['id'] }}">{{ s['name'] }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Create Desk</button>
+</form>
+
+<script>
+function validateDeskForm() {
+    const deskNum = document.getElementById('desk_number').value.trim();
+    const floor = document.getElementById('floor').value;
+    
+    if (deskNum.length === 0 || deskNum.length > 20) {
+        alert('Desk number must be 1-20 characters');
+        return false;
+    }
+    const pattern = /^[A-Za-z]{1,3}[- ]?[0-9]+[A-Za-z]*$/;
+    if (!pattern.test(deskNum)) {
+        alert('Desk number format invalid (e.g., SH 154, T-1)');
+        return false;
+    }
+    const floorNum = parseInt(floor);
+    if (isNaN(floorNum) || floorNum < 0 || floorNum > 100) {
+        alert('Floor must be between 0 and 100');
+        return false;
+    }
+    return true;
+}
+</script>
+
+<hr>
+
+<div style="margin-bottom:10px;">
+    <label>Search Desk:</label>
+    <input type="text" id="search_q" placeholder="Search desk number">
+    <label>Site:</label>
+    <select id="site_filter">
+        <option value="">All sites</option>
+        {% for s in sites %}
+            <option value="{{ s['id'] }}">{{ s['name'] }}</option>
+        {% endfor %}
+    </select>
+    <label>Per page: <input type="number" id="per_page" value="10" min="1" style="width:60px"></label>
+</div>
+
+<form id="desk-form" method="POST" action="{{ url_for('manage_desks') }}" style="display:none">
+    <input type="hidden" name="action" id="desk_action_field" value="">
+    <input type="hidden" name="desk_id" id="form_desk_id" value="">
+    <input type="hidden" name="desk_number" id="form_desk_number" value="">
+    <input type="hidden" name="floor" id="form_floor" value="">
+    <input type="hidden" name="site_id" id="form_site_id" value="">
+</form>
+
+<div id="desks-table">Loading...</div>
+<div id="desks-pagination" style="margin-top:10px"></div>
+
+<script>
+window.CONFIG = {{ config|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/manage_desks.js') }}"></script>
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+{% endblock %}

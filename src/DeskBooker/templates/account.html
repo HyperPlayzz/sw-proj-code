@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Account{% endblock %}
+
+{% block content %}
+<h2>Account Details</h2>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul style="color:green;">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('account') }}" onsubmit="return validateAccountForm()">
+    <label>Name:</label><br>
+    <input type="text" name="name" value="{{ user['name'] }}" required minlength="1" maxlength="100" id="account_name"><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" name="email" value="{{ user['email'] }}" required minlength="5" maxlength="120" id="account_email"><br><br>
+
+    <label>New Password:</label><br>
+    <input type="password" name="password" placeholder="Leave blank to keep current password" minlength="6" maxlength="255" id="account_password"><br><br>
+
+    <button type="submit">Update Account</button>
+</form>
+
+<script>
+function validateAccountForm() {
+    const name = document.getElementById('account_name').value.trim();
+    const email = document.getElementById('account_email').value.trim();
+    const pwd = document.getElementById('account_password').value;
+    
+    if (name.length === 0 || name.length > 100) {
+        alert('Name must be 1-100 characters');
+        return false;
+    }
+    if (email.length < 5 || email.length > 120) {
+        alert('Email must be 5-120 characters');
+        return false;
+    }
+    if (pwd.length > 0 && (pwd.length < 6 || pwd.length > 255)) {
+        alert('Password must be 6-255 characters');
+        return false;
+    }
+    return true;
+}
+</script>
+
+{% if session.get('role_id') != 1 %}
+<p><a href="{{ url_for('manage_desks') }}">Manage Desks</a></p>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+{% endblock %}

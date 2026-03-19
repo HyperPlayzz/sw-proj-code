@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Book Desk{% endblock %}
+
+{% block content %}
+<h2>Book a Desk</h2>
+
+<div id="error-message" style="color:red;">
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+        {{ message }}<br>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+</div>
+
+<form method="POST" action="{{ url_for('book_desk') }}" novalidate onsubmit="return validateBooking()">
+    <label>Desk:</label>
+    <select name="desk_id">
+        {% for d in desks %}
+        <option value="{{ d['id'] }}">{{ d['desk_number'] }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label>Start Time:</label>
+    <input type="datetime-local" name="start_time" id="start_time" required><br>
+
+    <label>End Time:</label>
+    <input type="datetime-local" name="end_time" id="end_time" required><br>
+
+    <button type="submit">Book Desk</button>
+</form>
+
+<script>
+function validateBooking() {
+    const start = document.getElementById('start_time').value;
+    const end = document.getElementById('end_time').value;
+    const errorDiv = document.getElementById('error-message');
+
+    if (!start || !end) {
+        errorDiv.textContent = "Please select both start and end times.";
+        return false;
+    }
+
+    if (end <= start) {
+        errorDiv.textContent = "End time must be after start time.";
+        return false;
+    }
+
+    errorDiv.textContent = "";
+    return true;
+}
+</script>
+{% endblock %}

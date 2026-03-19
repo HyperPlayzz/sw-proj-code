@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>
+    Welcome, {{ session.get('user_name') }}
+    {% if session.get('role_id') == 1 %}
+        (admin).
+    {% else %}
+        (user).
+    {% endif %}
+</h2>
+{% endblock %}

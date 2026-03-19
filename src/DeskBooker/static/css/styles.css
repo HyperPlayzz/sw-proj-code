@@ -1,0 +1,92 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    padding: 12px;
+    background: #ffffff;
+    border-right: 1px solid #e6e9ee;
+}
+
+.sidebar h3 { margin: 0 0 10px 0; }
+.sidebar ul { list-style: none; padding: 0; margin: 0; }
+.sidebar li { margin: 8px 0; }
+.sidebar a { color: #1a73e8; text-decoration: none; }
+.sidebar a:hover { text-decoration: underline; }
+
+.content {
+    flex: 1;
+    padding: 20px;
+    background: transparent;
+}
+
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="datetime-local"], select, textarea {
+    padding: 8px;
+    border: 1px solid #ccd3db;
+    border-radius: 3px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="number"]:focus, input[type="datetime-local"]:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #aab8c6;
+}
+
+
+input[type="checkbox"], input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Sort checkbox labels getting forced onto new lines */
+label { display: inline-block; }
+
+button {
+    /* button styling */
+    background: #f1f5fb;
+    color: #1a73e8;
+    border: 1px solid #d0d9ea;
+    padding: 6px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 14px;
+}
+button:hover { background: #e6eefc; }
+
+/* centre login box */
+.login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 16px;
+}
+.login-box {
+    width: 320px;
+    background: #fff;
+    border: 1px solid #e6e9ee;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+}
+.login-box h2 { margin-top: 0; font-size: 20px; color: #1a73e8; }
+.login-box .flash { color: #b00020; margin-bottom: 10px; }
+
+@media (max-width: 600px) {
+    .sidebar { display: none; }
+    .container { display: block; }
+    .login-box { width: 100%; }
+}

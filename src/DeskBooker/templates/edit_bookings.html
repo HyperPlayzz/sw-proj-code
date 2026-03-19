@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Bookings{% endblock %}
+
+{% block content %}
+<h2>Edit Bookings</h2>
+
+{% if is_admin %}
+<div style="margin-bottom:10px;">
+    <label><input type="checkbox" id="admin_view_chk" {% if admin_view %}checked{% endif %}> Admin view (edit all users)</label>
+    
+    <input type="text" id="search_q" placeholder="Search staff" value="{{ q or '' }}" {% if not admin_view %}style="display:none"{% endif %}>
+    <label id="per_page_label" {% if not admin_view %}style="display:none"{% endif %}>Per page: <input type="number" id="per_page" value="{{ per_page or 10 }}" min="1" style="width:60px"></label>
+</div>
+{% endif %}
+
+<div id="bookings-root">
+    <form id="update-form" method="POST" action="{{ url_for('edit_bookings') }}" style="display:none">
+        <input type="hidden" name="admin_view" id="admin_view_field" value="{% if admin_view %}1{% endif %}">
+        <input type="hidden" name="booking_id" id="form_booking_id">
+        <input type="hidden" name="desk_id" id="form_desk_id">
+        <input type="hidden" name="start_time" id="form_start_time">
+        <input type="hidden" name="end_time" id="form_end_time">
+    </form>
+
+    <div id="bookings-table-container">Loading...</div>
+    <div id="bookings-pagination" style="margin-top:10px"></div>
+</div>
+
+<script>
+window.CONFIG = {
+    apiUrl: {{ url_for('api_bookings')|tojson }},
+    editUrl: {{ url_for('edit_bookings')|tojson }},
+    desks: {{ desks|tojson }},
+    isAdmin: {{ is_admin|tojson }},
+    initialPage: {{ page|default(1)|tojson }},
+    initialPerPage: {{ per_page|default(10)|tojson }},
+    initialTotalPages: {{ total_pages|default(1)|tojson }},
+    initialTotal: {{ total|default(0)|tojson }}
+};
+</script>
+<script src="{{ url_for('static', filename='js/edit_bookings.js') }}"></script>
+{% endblock %}

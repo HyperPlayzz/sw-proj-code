@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Book Desk{% endblock %}
+
+{% block content %}
+<h2>Book a Desk</h2>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div style="color: green;">
+      {% for msg in messages %}
+        {{ msg }}<br>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('book_desk') }}">
+    <label for="site-select">Site:</label><br>
+    <select id="site-select" name="site_id" required>
+        <option value="">Select a site</option>
+        {% for site in sites %}
+            <option value="{{ site['id'] }}">{{ site['name'] }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label for="desk-select">Desk:</label><br>
+    <select id="desk-select" name="desk_id" required>
+        <option value="">Select a desk</option>
+    </select><br><br>
+
+    <label>Start Time:</label><br>
+    <input type="datetime-local" name="start_time" required id="start-time-input"><br><br>
+
+    <label>End Time:</label><br>
+    <input type="datetime-local" name="end_time" required id="end-time-input"><br><br>
+
+    <button type="submit" onclick="return validateBookingTimes()">Book Desk</button>
+</form>
+
+<script>
+function validateBookingTimes() {
+    const startInput = document.getElementById('start-time-input');
+    const endInput = document.getElementById('end-time-input');
+    const start = new Date(startInput.value);
+    const end = new Date(endInput.value);
+    const now = new Date();
+    
+    if (!startInput.value || !endInput.value) {
+        alert('Both start and end times are required');
+        return false;
+    }
+    if (start < now) {
+        alert('Cannot book in the past');
+        return false;
+    }
+    if (end <= start) {
+        alert('End time must be after start time');
+        return false;
+    }
+    return true;
+}
+</script>
+    return true;
+}
+
+<script>
+    window.ALL_DESKS = {{ desks|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/book_desk.js') }}"></script>
+{% endblock %}

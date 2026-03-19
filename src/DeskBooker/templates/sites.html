@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Sites{% endblock %}
+
+{% block content %}
+<h2>Manage Sites</h2>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flash-messages">
+            {% for msg in messages %}
+                <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<h3>Create New Site</h3>
+<form method="POST" onsubmit="return validateSiteName(this)">
+    <input type="hidden" name="action" value="create">
+    <label>Site Name:</label>
+    <input type="text" name="name" required minlength="1" maxlength="120" id="site_name_create">
+    <button type="submit">Create Site</button>
+</form>
+
+<script>
+function validateSiteName(form) {
+    const name = form.querySelector('input[name="name"]').value.trim();
+    if (name.length === 0 || name.length > 120) {
+        alert('Site name must be 1-120 characters');
+        return false;
+    }
+    return true;
+}
+</script>
+
+<hr>
+
+<h3>Existing Sites</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Site Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for site in sites %}
+        <tr>
+            <td>{{ site['id'] }}</td>
+            <td>
+                <form method="POST" style="display:inline-block">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="site_id" value="{{ site['id'] }}">
+                    <input type="text" name="name" value="{{ site['name'] }}" required minlength="1" maxlength="120" onsubmit="return this.value.trim().length > 0 && this.value.trim().length <= 120">
+            </td>
+            <td>
+                    <button type="submit">Update</button>
+                </form>
+                <form method="POST" style="display:inline-block">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="site_id" value="{{ site['id'] }}">
+                    <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

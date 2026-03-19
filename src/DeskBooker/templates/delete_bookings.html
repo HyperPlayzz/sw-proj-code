@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Bookings{% endblock %}
+
+{% block content %}
+<h2>Delete Bookings</h2>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div style="color:green;">
+      {% for message in messages %}
+        {{ message }}<br>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div id="delete-root">
+  {% if is_admin %}
+  <div style="margin-bottom:10px;">
+    <label><input type="checkbox" id="admin_view_chk" {% if admin_view %}checked{% endif %}> Admin view (all users)</label>
+    
+    <input type="text" id="search_q" placeholder="Search staff" value="{{ q or '' }}">
+    <label id="per_page_label">Per page: <input type="number" id="per_page" value="{{ per_page or 10 }}" min="1" style="width:60px"></label>
+  </div>
+  {% endif %}
+
+  <form id="delete-form" method="POST" action="{{ url_for('delete_bookings') }}" style="display:none">
+    <input type="hidden" name="admin_view" id="del_admin_view_field" value="{% if admin_view %}1{% endif %}">
+    <input type="hidden" name="booking_id" id="del_form_booking_id">
+  </form>
+
+  <div id="delete-table-container">Loading...</div>
+  <div id="delete-pagination" style="margin-top:10px"></div>
+</div>
+
+<noscript>
+{% if bookings %}
+<form method="POST" action="{{ url_for('delete_bookings') }}">
+    {% if is_admin and admin_view %}
+    <input type="hidden" name="admin_view" value="1">
+    {% endif %}
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Desk</th>
+            <th>User</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Action</th>
+        </tr>
+        {% for b in bookings %}
+        <tr>
+            <td>{{ b['desk_number'] }}</td>
+            <td>{{ b['user_name'] }}</td>
+            <td>{{ b['start_time'] }}</td>
+            <td>{{ b['end_time'] }}</td>
+            <td>
+                <button type="submit" name="booking_id" value="{{ b['booking_id'] }}">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</form>
+
+{% if is_admin and admin_view %}
+<div style="margin-top:10px;">
+    <span>Page {{ page }} of {{ total_pages }} ({{ total }} results)</span>
+    <div style="margin-top:5px;">
+        {% set params = {} %}
+        {% if q %}{% set _ = params.update({'q': q}) %}{% endif %}
+        {% set _ = params.update({'admin_view':'1','per_page': per_page}) %}
+
+        {% if page > 1 %}
+            {% set prev_params = params.copy() %}
+            {% set _ = prev_params.update({'page': page-1}) %}
+            <a href="{{ url_for('delete_bookings') }}?{{ prev_params|urlencode }}">< Prev</a>
+        {% endif %}
+
+        {% if page < total_pages %}
+            {% set next_params = params.copy() %}
+            {% set _ = next_params.update({'page': page+1}) %}
+            <a href="{{ url_for('delete_bookings') }}?{{ next_params|urlencode }}">Next ></a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% else %}
+<p>No bookings found.</p>
+{% endif %}
+</noscript>
+
+<script>
+window.CONFIG = {{ config|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/delete_bookings.js') }}"></script>
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+{% endblock %}
