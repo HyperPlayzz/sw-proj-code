@@ -55,6 +55,11 @@ class User(db.Model):
     def validate_email(self, key: str, address: str) -> str:
         if not address or '@' not in address:
             raise ValueError('Invalid email format')
+        local, _, domain = address.partition('@')
+        if not local or not domain or '.' not in domain:
+            raise ValueError('Invalid email domain (e.g. x.com)')
+        if len(domain) > 255:
+            raise ValueError('Domain too long')
         if len(address) > 120:
             raise ValueError('Email too long (max 120 characters)')
         if len(address) < 5:

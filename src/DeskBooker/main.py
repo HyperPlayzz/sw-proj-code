@@ -5,7 +5,7 @@ from DeskBooker.services import BookingService, DeskService
 from DeskBooker.db import init_db
 from werkzeug.security import check_password_hash, generate_password_hash
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
 
 
@@ -137,7 +137,9 @@ def create_app(test_config=None):
 
         sites = [ {'id': s.id, 'name': s.name} for s in Site.query.order_by(Site.name).all() ]
         desks = [ {'id': d.id, 'desk_number': d.desk_number, 'site_id': d.site_id} for d in Desk.query.order_by(Desk.desk_number).all() ]
-        return render_template('book_desk.html', sites=sites, desks=desks)
+        max_date = (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%dT%H:%M')
+        min_date = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        return render_template('book_desk.html', sites=sites, desks=desks, max_date=max_date, min_date=min_date)
 
     @app.route('/edit_bookings', methods=['GET', 'POST'])
     @login_required

@@ -31,8 +31,9 @@
             });
             html += '</select></td>';
             html += '<td>' + (b.user_name || '') + '</td>';
-            html += '<td><input type="datetime-local" class="start-input" value="' + (b.start_time.replace(' ', 'T')) + '"></td>';
-            html += '<td><input type="datetime-local" class="end-input" value="' + (b.end_time.replace(' ', 'T')) + '"></td>';
+            const maxDate = new Date(); maxDate.setFullYear(maxDate.getFullYear()+1); const maxDateString = maxDate.toISOString().slice(0,16);
+            html += '<td><input type="datetime-local" class="start-input" value="' + (b.start_time.replace(' ', 'T')) + '" max="' + maxDateString + '"></td>';
+            html += '<td><input type="datetime-local" class="end-input" value="' + (b.end_time.replace(' ', 'T')) + '" max="' + maxDateString + '"></td>';
             html += '<td><button class="update-btn" data-booking-id="' + b.booking_id + '">Update</button></td>';
             html += '</tr>';
         });

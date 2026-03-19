@@ -30,7 +30,7 @@
         <input type="email" name="email" required minlength="5" maxlength="120"><br><br>
 
         <label>Password:</label><br>
-        <input type="password" name="password" required minlength="6"><br><br>
+        <input type="password" name="password" required><br><br>
 
         <button type="submit">Login</button>
     </form>
@@ -85,6 +85,10 @@
         }
         if (email.length < 5 || email.length > 120) {
             alert('Email must be 5-120 characters');
+            return false;
+        }
+        if (!email.includes('@') || !email.split('@')[1].includes('.')) {
+            alert('Email must include a valid domain (e.g. x.com)');
             return false;
         }
         if (pwd.length < 6 || pwd.length > 255) {

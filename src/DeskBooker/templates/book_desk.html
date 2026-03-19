@@ -30,10 +30,10 @@
     </select><br><br>
 
     <label>Start Time:</label><br>
-    <input type="datetime-local" name="start_time" required id="start-time-input"><br><br>
+    <input type="datetime-local" name="start_time" required id="start-time-input" min="{{ min_date }}" max="{{ max_date }}"><br><br>
 
     <label>End Time:</label><br>
-    <input type="datetime-local" name="end_time" required id="end-time-input"><br><br>
+    <input type="datetime-local" name="end_time" required id="end-time-input" min="{{ min_date }}" max="{{ max_date }}"><br><br>
 
     <button type="submit" onclick="return validateBookingTimes()">Book Desk</button>
 </form>

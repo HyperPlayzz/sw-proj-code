@@ -25,6 +25,9 @@ class UserRepo:
             raise ValueError('Email required')
         if '@' not in email:
             raise ValueError('Invalid email format')
+        local, _, domain = email.partition('@')
+        if not local or not domain or '.' not in domain:
+            raise ValueError('Invalid email domain (e.g. x.com)')
         if len(email) > 120:
             raise ValueError('Email too long (max 120 characters)')
         if len(email) < 5:
