@@ -23,8 +23,8 @@
             html += '<tr>';
             html += '<td>' + (b.desk_number || '') + '</td>';
             html += '<td>' + (b.user_name || '') + '</td>';
-            html += '<td>' + (b.start_time || '') + '</td>';
-            html += '<td>' + (b.end_time || '') + '</td>';
+            html += '<td>' + (b.start_time_formatted || b.start_time || '') + '</td>';
+            html += '<td>' + (b.end_time_formatted || b.end_time || '') + '</td>';
             html += '<td><button class="delete-btn" data-booking-id="' + b.booking_id + '">Delete</button></td>';
             html += '</tr>';
         });
@@ -70,7 +70,22 @@
         url.searchParams.set('per_page', per);
         url.searchParams.set('admin_view', admin_view);
         if (q) url.searchParams.set('q', q);
-        fetch(url.toString()).then(r => r.json()).then(data => renderDeleteTable(data)).catch(() => {});
+        fetch(url.toString()).then(r => {
+            if (!r.ok) {
+                throw new Error('Fetch failed with status ' + r.status);
+            }
+            return r.json();
+        }).then(data => renderDeleteTable(data)).catch(err => {
+            console.error('Delete bookings fetch error', err);
+            const container = document.getElementById('delete-table-container');
+            if (container) {
+                container.innerHTML = '<p>Error loading bookings. Please refresh.</p>';
+            }
+            const pagination = document.getElementById('delete-pagination');
+            if (pagination) {
+                pagination.innerHTML = '';
+            }
+        });
     }
 
     const searchInput = document.getElementById('search_q'); 

@@ -152,6 +152,7 @@ class Booking(db.Model):
         return end_time
 
     def to_dict(self) -> Dict[str, Any]:
+        # Keep machine-readable format for form inputs, and include formatted display values
         return {
             'booking_id': self.id,
             'user_id': self.user_id,
@@ -159,5 +160,7 @@ class Booking(db.Model):
             'desk_number': self.desk.desk_number if self.desk else None,
             'user_name': self.user.name if self.user else None,
             'start_time': self.start_time.strftime('%Y-%m-%d %H:%M'),
-            'end_time': self.end_time.strftime('%Y-%m-%d %H:%M')
+            'end_time': self.end_time.strftime('%Y-%m-%d %H:%M'),
+            'start_time_formatted': self.start_time.strftime('%d/%m/%Y %H:%M'),
+            'end_time_formatted': self.end_time.strftime('%d/%m/%Y %H:%M')
         }

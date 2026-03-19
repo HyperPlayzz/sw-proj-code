@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Lookup Desk Bookings{% endblock %}
+
+{% block content %}
+<h2>Lookup Desk Booking Times</h2>
+
+<form method="GET" action="{{ url_for('lookup_bookings') }}">
+    <label for="site-select">Site:</label>
+    <select id="site-select" name="site_id">
+        <option value="">All sites</option>
+        {% for site in sites %}
+            <option value="{{ site.id }}" {% if selected_site_id and selected_site_id == site.id %}selected{% endif %}>{{ site.name }}</option>
+        {% endfor %}
+    </select>
+    <label for="desk-q">Desk:</label>
+    <input type="text" id="desk-q" name="desk_q" value="{{ desk_q or '' }}" placeholder="Desk number contains...">
+</form>
+<script>
+const deskInput = document.getElementById('desk-q');
+const siteSelect = document.getElementById('site-select');
+const lookupForm = document.querySelector('form[action="{{ url_for('lookup_bookings') }}"]');
+let lookupTimer = null;
+if (deskInput && lookupForm) {
+    deskInput.addEventListener('input', () => {
+        clearTimeout(lookupTimer);
+        lookupTimer = setTimeout(() => { lookupForm.submit(); }, 250);
+    });
+}
+if (siteSelect && lookupForm) {
+    siteSelect.addEventListener('change', () => { lookupForm.submit(); });
+}
+</script>
+
+{% if bookings is none or bookings|length == 0 %}
+    <p>No matching bookings found.</p>
+{% else %}
+    <table border="1" cellpadding="5" style="margin-top:10px;">
+        <thead>
+            <tr>
+                <th>Desk</th>
+                <th>Site</th>
+                <th>User</th>
+                <th>Start</th>
+                <th>End</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in bookings %}
+                <tr>
+                    <td>{{ b.desk_number }}</td>
+                    <td>{{ b.site_name }}</td>
+                    <td>{{ b.user_name }}</td>
+                    <td>{{ b.start_time_formatted or b.start_time }}</td>
+                    <td>{{ b.end_time_formatted or b.end_time }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

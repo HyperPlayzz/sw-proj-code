@@ -52,8 +52,8 @@
         <tr>
             <td>{{ b['desk_number'] }}</td>
             <td>{{ b['user_name'] }}</td>
-            <td>{{ b['start_time'] }}</td>
-            <td>{{ b['end_time'] }}</td>
+            <td>{{ b['start_time_formatted'] or b['start_time'] }}</td>
+            <td>{{ b['end_time_formatted'] or b['end_time'] }}</td>
             <td>
                 <button type="submit" name="booking_id" value="{{ b['booking_id'] }}">Delete</button>
             </td>
@@ -93,7 +93,7 @@
 <script>
 window.CONFIG = {{ config|tojson }};
 </script>
-<script src="{{ url_for('static', filename='js/delete_bookings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/delete_booking.js') }}"></script>
 
 <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
 {% endblock %}

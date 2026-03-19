@@ -89,10 +89,22 @@
         url.searchParams.set('admin_view', admin_view);
         if (q) url.searchParams.set('q', q);
 
-        fetch(url.toString()).then(r => r.json()).then(data => {
+        fetch(url.toString()).then(r => {
+            if (!r.ok) throw new Error('Fetch failed: ' + r.status);
+            return r.json();
+        }).then(data => {
             renderTable(data);
-            document.getElementById('admin_view_field').value = admin_view === '1' ? '1' : '';
-        }).catch(() => {});
+            const adminField = document.getElementById('admin_view_field');
+            if (adminField) {
+                adminField.value = admin_view === '1' ? '1' : '';
+            }
+        }).catch(err => {
+            console.error('Error loading bookings', err);
+            const container = document.getElementById('bookings-table-container');
+            if (container) container.innerHTML = '<p>Error loading bookings. Please refresh.</p>';
+            const pagination = document.getElementById('bookings-pagination');
+            if (pagination) pagination.innerHTML = '';
+        });
     }
 
     const searchInput = document.getElementById('search_q');

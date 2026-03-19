@@ -96,15 +96,18 @@ def create_app(test_config=None):
     def book_desk():
         # Handle booking form submission
         if request.method == 'POST':
-            site_id = request.form['site_id']
-            desk_id = request.form['desk_id']
+            try:
+                site_id = int(request.form['site_id'])
+                desk_id = int(request.form['desk_id'])
+            except (ValueError, TypeError):
+                flash('Invalid site or desk selection')
+                return redirect(url_for('book_desk'))
             start_time = request.form['start_time']
             end_time = request.form['end_time']
             # Validate input and convert times
             try:
                 start_dt = datetime.strptime(start_time, '%Y-%m-%dT%H:%M')
                 end_dt = datetime.strptime(end_time, '%Y-%m-%dT%H:%M')
-            
             except ValueError:
                 # Invalid datetime format
                 flash('Invalid datetime format')
@@ -219,6 +222,44 @@ def create_app(test_config=None):
         }
 
         return render_template('edit_bookings.html', bookings=bookings_out, desks=desks, is_admin=(role_id==1), admin_view=admin_view, q=q, page=page, per_page=per_page, total=total, total_pages=total_pages, config=config)
+
+    @app.route('/lookup_bookings', methods=['GET'])
+    @login_required
+    def lookup_bookings():
+        site_id = request.args.get('site_id')
+        desk_q = request.args.get('desk_q', '').strip()
+
+        # Fetch sites for dropdown
+        sites = [ {'id': s.id, 'name': s.name} for s in Site.query.order_by(Site.name).all() ]
+        selected_site_id = None
+        if site_id:
+            try:
+                selected_site_id = int(site_id)
+            except ValueError:
+                selected_site_id = None
+
+        # Build query for bookings with joins
+        q = Booking.query.join(Desk).join(Site).join(User)
+        if selected_site_id:
+            q = q.filter(Site.id == selected_site_id)
+        if desk_q:
+            q = q.filter(Desk.desk_number.ilike(f"%{desk_q}%"))
+        q = q.order_by(Booking.start_time)
+
+        bookings = q.all()
+        results = []
+        for b in bookings:
+            results.append({
+                'desk_number': b.desk.desk_number if b.desk else '',
+                'site_name': b.desk.site.name if b.desk and b.desk.site else '',
+                'user_name': b.user.name if b.user else '',
+                'start_time': b.start_time.strftime('%Y-%m-%d %H:%M'),
+                'end_time': b.end_time.strftime('%Y-%m-%d %H:%M'),
+                'start_time_formatted': b.start_time.strftime('%d/%m/%Y %H:%M'),
+                'end_time_formatted': b.end_time.strftime('%d/%m/%Y %H:%M')
+            })
+
+        return render_template('lookup_bookings.html', sites=sites, selected_site_id=selected_site_id, desk_q=desk_q, bookings=results)
 
     @app.route('/delete_bookings', methods=['GET', 'POST'])
     @login_required
