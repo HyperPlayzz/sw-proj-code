@@ -281,6 +281,9 @@ def create_app(test_config=None):
 
 # Handle booking deletion form submission
         if request.method == 'POST':
+            if request.form.get('confirm_delete') != 'yes':
+                flash('Deletion cancelled: please confirm yes before deleting')
+                return redirect(url_for('delete_bookings'))
             booking_id = int(request.form['booking_id'])
             if role_id == 1 and admin_view:
                 BookingRepo.delete(booking_id)
@@ -360,29 +363,47 @@ def create_app(test_config=None):
             action = request.form['action']
             # Validate input and perform action
             try:
+                # Parse IDs and numeric values safely
+                if action in ('create', 'update'):
+                    floor = int(request.form['floor'])
+                    site_id = int(request.form['site_id'])
+                if action == 'update':
+                    desk_id = int(request.form['desk_id'])
+
                 # iF creating or updating, validate desk number and floor
                 if action == 'create':
-                    d = Desk(desk_number=request.form['desk_number'], floor=request.form['floor'], site_id=request.form['site_id'])
+                    d = Desk(desk_number=request.form['desk_number'], floor=floor, site_id=site_id)
                     db.session.add(d)
                     db.session.commit()
                     flash('Desk created')
 
                 # If updating, validate that desk exists and then update fields
                 elif action == 'update':
-                    d = Desk.query.get(request.form['desk_id'])
+                    d = Desk.query.get(desk_id)
+                    if not d:
+                        raise ValueError('Desk not found')
                     d.desk_number = request.form['desk_number']
-                    d.floor = request.form['floor']
-                    d.site_id = request.form['site_id']
+                    d.floor = floor
+                    d.site_id = site_id
                     db.session.commit()
                     flash('Desk updated')
 
                 # If deleting, validate that desk exists and then delete
                 elif action == 'delete':
-                    Desk.query.filter_by(id=request.form['desk_id']).delete()
-                    db.session.commit()
-                    flash('Desk deleted')
-                # Handle validation errors from model layer
-            except ValueError as e:
+                    if request.form.get('confirm_delete') != 'yes':
+                        flash('Deletion cancelled: please confirm yes before deleting')
+                    else:
+                        desk_id = int(request.form['desk_id'])
+                        desk = Desk.query.get(desk_id)
+                        if not desk:
+                            flash('Desk not found')
+                        elif len(desk.bookings) > 0:
+                            flash('Cannot delete desk while bookings exist. Delete bookings first.')
+                        else:
+                            db.session.delete(desk)
+                            db.session.commit()
+                            flash('Desk deleted')
+            except (ValueError, TypeError) as e:
                 db.session.rollback()
                 flash(str(e))
 
@@ -448,9 +469,18 @@ def create_app(test_config=None):
                 db.session.commit()
                 flash('Site updated')
             elif action == 'delete':
-                Site.query.filter_by(id=request.form['site_id']).delete()
-                db.session.commit()
-                flash('Site deleted')
+                if request.form.get('confirm_delete') != 'yes':
+                    flash('Deletion cancelled: please confirm yes before deleting')
+                else:
+                    site = Site.query.get(request.form['site_id'])
+                    if not site:
+                        flash('Site not found')
+                    elif len(site.desks) > 0:
+                        flash('Cannot delete site while desks exist for this site. Delete desks first.')
+                    else:
+                        db.session.delete(site)
+                        db.session.commit()
+                        flash('Site deleted')
             return redirect(url_for('manage_sites'))
         sites = [ {'id': s.id, 'name': s.name} for s in Site.query.order_by(Site.name).all() ]
         return render_template('sites.html', sites=sites)

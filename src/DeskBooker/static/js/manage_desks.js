@@ -34,7 +34,7 @@
         // Build the HTML table with desk data and edit/delete buttons
         let html = '<table border="1" cellpadding="5"><tr><th>Desk Number</th><th>Floor</th><th>Site</th><th>Actions</th></tr>';
         data.desks.forEach(d => {
-            html += `<tr>`;
+            html += `<tr data-site-id="${d.site_id}" data-site-name="${d.site_name}">`;
             html += `<td>${d.desk_number}</td>`;
             html += `<td>${d.floor}</td>`;
             html += `<td>${d.site_name}</td>`;
@@ -56,16 +56,16 @@
                 const row = btn.closest('tr');
                 const deskNumber = row.children[0].innerText;
                 const floor = row.children[1].innerText;
-                const siteName = row.children[2].innerText;
-                const siteSelect = document.getElementById('site_filter');
+                const siteId = row.dataset.siteId || '';
+                document.getElementById('desk-form-title').innerText = 'Edit Desk';
                 document.getElementById('desk_action_field').value = 'update';
-                document.getElementById('form_desk_id').value = id;
-                document.getElementById('form_desk_number').value = deskNumber;
-                document.getElementById('form_floor').value = floor;
-                const opts = Array.from(siteSelect.options);
-                const match = opts.find(o => o.text === siteName);
-                document.getElementById('form_site_id').value = match ? match.value : '';
-                document.getElementById('desk-form').submit();
+                document.getElementById('desk_id').value = id;
+                document.getElementById('desk_number').value = deskNumber;
+                document.getElementById('floor').value = floor;
+                document.getElementById('site_id_select').value = siteId;
+                document.getElementById('desk_submit_btn').innerText = 'Update Desk';
+                const cancelBtn = document.getElementById('cancel-edit-btn');
+                if (cancelBtn) cancelBtn.style.display = 'inline-block';
             });
         });
 
@@ -75,8 +75,10 @@
                 if (!confirm('Delete this desk?')) return;
                 const id = btn.dataset.id;
                 document.getElementById('desk_action_field').value = 'delete';
-                document.getElementById('form_desk_id').value = id;
-                document.getElementById('desk-form').submit();
+                document.getElementById('desk_id').value = id;
+                const confirmField = document.getElementById('desk_confirm_delete_field');
+                if (confirmField) confirmField.value = 'yes';
+                document.getElementById('desk-main-form').submit();
             });
         });
     }
@@ -106,6 +108,22 @@
     }
     const siteSelect = document.getElementById('site_filter');
     if (siteSelect) siteSelect.addEventListener('change', () => fetchDesks(1));
+
+    const cancelBtn = document.getElementById('cancel-edit-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            document.getElementById('desk-form-title').innerText = 'Create Desk';
+            document.getElementById('desk_action_field').value = 'create';
+            document.getElementById('desk_id').value = '';
+            const confirmDesk = document.getElementById('desk_confirm_delete_field');
+            if (confirmDesk) confirmDesk.value = '';
+            document.getElementById('desk_number').value = '';
+            document.getElementById('floor').value = '';
+            document.getElementById('site_id_select').value = '';
+            document.getElementById('desk_submit_btn').innerText = 'Create Desk';
+            cancelBtn.style.display = 'none';
+        });
+    }
 
     fetchDesks();
 })();

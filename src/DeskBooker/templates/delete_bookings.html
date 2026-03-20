@@ -28,6 +28,7 @@
   <form id="delete-form" method="POST" action="{{ url_for('delete_bookings') }}" style="display:none">
     <input type="hidden" name="admin_view" id="del_admin_view_field" value="{% if admin_view %}1{% endif %}">
     <input type="hidden" name="booking_id" id="del_form_booking_id">
+    <input type="hidden" name="confirm_delete" id="del_confirm_delete_field" value="">
   </form>
 
   <div id="delete-table-container">Loading...</div>
@@ -36,7 +37,8 @@
 
 <noscript>
 {% if bookings %}
-<form method="POST" action="{{ url_for('delete_bookings') }}">
+<form method="POST" action="{{ url_for('delete_bookings') }}" onsubmit="return confirm('Delete selected booking?');">
+    <input type="hidden" name="confirm_delete" value="yes">
     {% if is_admin and admin_view %}
     <input type="hidden" name="admin_view" value="1">
     {% endif %}

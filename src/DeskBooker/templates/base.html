@@ -23,7 +23,7 @@
                     <li><a href="{{ url_for('manage_sites') }}">Manage Sites</a></li>
                 {% endif %}
 
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('logout') }}" onclick="return confirm('Are you sure you want to logout?');">Logout</a></li>
             </ul>
         </div>
 

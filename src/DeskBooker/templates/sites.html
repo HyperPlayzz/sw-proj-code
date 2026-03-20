@@ -61,6 +61,7 @@ function validateSiteName(form) {
                 <form method="POST" style="display:inline-block">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="site_id" value="{{ site['id'] }}">
+                    <input type="hidden" name="confirm_delete" value="yes">
                     <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
                 </form>
             </td>

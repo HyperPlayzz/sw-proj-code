@@ -39,10 +39,17 @@
         // Make delete buttons functional by submitting the delete form with the booking ID
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', function() {
+                if (!confirm('Delete this booking?')) {
+                    return;
+                }
                 const bid = this.dataset.bookingId;
                 document.getElementById('del_form_booking_id').value = bid;
                 const admin_view = document.getElementById('admin_view_chk') ? (document.getElementById('admin_view_chk').checked ? '1' : '') : '';
                 document.getElementById('del_admin_view_field').value = admin_view;
+                const confirmField = document.getElementById('del_confirm_delete_field');
+                if (confirmField) {
+                    confirmField.value = 'yes';
+                }
                 document.getElementById('delete-form').submit();
             });
         });
